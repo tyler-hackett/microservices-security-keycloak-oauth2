@@ -21,10 +21,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.github.tylerhackett</groupId>
-			<artifactId>caf-domain</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.github.tylerhackett</groupId>
 			<artifactId>caf-dto</artifactId>
 		</dependency>
 	</dependencies>

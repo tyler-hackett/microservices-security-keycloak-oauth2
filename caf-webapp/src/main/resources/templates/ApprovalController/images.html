@@ -6,11 +6,15 @@
     {#if images}
         <table class="gridTable">
             <tr>
+                <th>Thumbnail</th>
                 <th>Caption</th>
                 <th>Uploader</th>
             </tr>
             {#for image in images}
                 <tr>
+                    <td>
+                        <img src="{image.thumbnail}" alt="thumbnail image"/>
+                    </td>
                     <td>
                         <a href="/web/approval/{image.id}">{image.caption}</a>
                     </td>

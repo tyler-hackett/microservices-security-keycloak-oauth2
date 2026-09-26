@@ -25,28 +25,29 @@
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-arc</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>io.quarkus</groupId>
-			<artifactId>quarkus-hibernate-orm</artifactId>
-		</dependency>
 
 		<!-- https://quarkus.io/guides/security-keycloak-admin-client -->
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-keycloak-admin-rest-client</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-rest-jackson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-rest-client-jackson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-rest-client-oidc-token-propagation </artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.uuid</groupId>
 			<artifactId>java-uuid-generator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.github.tylerhackett</groupId>
-			<artifactId>caf-domain</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.github.tylerhackett</groupId>

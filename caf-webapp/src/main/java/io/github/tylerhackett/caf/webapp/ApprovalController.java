@@ -1,7 +1,6 @@
 package io.github.tylerhackett.caf.webapp;
 
 import io.github.tylerhackett.caf.service.IImageService;
-import io.github.tylerhackett.caf.service.Role;
 import io.github.tylerhackett.caf.service.dto.ImageDto;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
@@ -28,7 +27,7 @@ import java.util.UUID;
 @RequestScoped
 @Transactional
 @Path("/web/approval")
-@RolesAllowed(Role.APPROVER)
+@RolesAllowed("approver")
 public class ApprovalController {
 
     public static final String IMAGE_BUCKET_CONFIG_KEY = "caf.image.bucket";

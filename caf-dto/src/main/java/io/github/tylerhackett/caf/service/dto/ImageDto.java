@@ -25,6 +25,8 @@ public class ImageDto implements Serializable {
 
     private String loader;
 
+    private String thumbnail;
+
     private List<CommentDto> comments;
 
     public UUID getId() {
@@ -49,6 +51,14 @@ public class ImageDto implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public boolean isApproved() {

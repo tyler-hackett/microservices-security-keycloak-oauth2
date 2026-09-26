@@ -39,7 +39,6 @@ public class ImageDao implements IImageDao {
 			throw new EntityNotFoundException(String.format("Image %s not found in the database.", id.toString()));
 		}
 		em.remove(image);
-		em.flush();
 	}
 
 	@Override
@@ -64,7 +63,6 @@ public class ImageDao implements IImageDao {
 		}
 		comment.getImage().removeComment(comment);
 		em.remove(comment);
-		em.flush();
 	}
 
 	@Override
@@ -118,7 +116,6 @@ public class ImageDao implements IImageDao {
 		} else {
 			logger.info("...image not approved!");
 			em.remove(image);
-			em.flush();
 		}
 	}
 

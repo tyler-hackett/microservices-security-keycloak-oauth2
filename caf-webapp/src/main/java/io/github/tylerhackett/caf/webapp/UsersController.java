@@ -6,6 +6,7 @@ import io.github.tylerhackett.caf.service.dto.UserDtoFactory;
 import io.quarkus.qute.CheckedTemplate;
 import io.quarkus.qute.TemplateInstance;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -62,7 +63,7 @@ public class UsersController {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     // Restrict to admin role
-    @jakarta.annotation.security.RolesAllowed(io.github.tylerhackett.caf.service.Role.ADMIN)
+    @RolesAllowed("admin")
     public TemplateInstance addUser(@FormParam(USERNAME) String username,
                                     @FormParam(PASSWORD) String password,
                                     @FormParam(FIRST_NAME) String firstName,
@@ -87,7 +88,7 @@ public class UsersController {
 
     @GET
     // Restrict to admin and user roles
-    @jakarta.annotation.security.RolesAllowed({io.github.tylerhackett.caf.service.Role.ADMIN, io.github.tylerhackett.caf.service.Role.USER})
+    @RolesAllowed({"admin", "user"})
     public TemplateInstance listUsers() {
         logger.info("Getting list of users.");
         return Templates.users(userService.getUsers());

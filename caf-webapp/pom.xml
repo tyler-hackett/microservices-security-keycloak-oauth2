@@ -28,10 +28,6 @@
 			<artifactId>quarkus-rest</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.quarkus</groupId>
-			<artifactId>quarkus-hibernate-orm</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>io.quarkiverse.qute.web</groupId>
 			<artifactId>quarkus-qute-web</artifactId>
 		</dependency>
@@ -54,6 +50,10 @@
 		<dependency>
 			<groupId>io.quarkiverse.amazonservices</groupId>
 			<artifactId>quarkus-amazon-s3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-container-image-docker</artifactId>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>software.amazon.awssdk</groupId>-->

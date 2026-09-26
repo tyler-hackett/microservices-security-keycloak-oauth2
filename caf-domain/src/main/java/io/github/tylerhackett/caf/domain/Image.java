@@ -42,6 +42,9 @@ public class Image implements Serializable {
 
     private String loader;
 
+    @Lob
+    private String thumbnail;
+
     private boolean approved;
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -86,6 +89,14 @@ public class Image implements Serializable {
 
     public void setLoader(String user) {
         this.loader = user;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public boolean isApproved() {

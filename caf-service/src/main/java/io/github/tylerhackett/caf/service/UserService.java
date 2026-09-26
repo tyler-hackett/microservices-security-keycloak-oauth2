@@ -4,7 +4,9 @@ import io.github.tylerhackett.caf.service.dto.UserDto;
 import io.github.tylerhackett.caf.service.dto.UserDtoFactory;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RoleResource;
@@ -14,8 +16,6 @@ import org.keycloak.representations.idm.UserRepresentation;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @RequestScoped
 public class UserService implements IUserService {
@@ -38,11 +38,12 @@ public class UserService implements IUserService {
 
     private RoleResource clientRoleResource;
 
+    // Inject config property for client webapp realm
     @Inject
     @ConfigProperty(name = CLIENT_REALM_KEY)
     String clientRealm;
 
-    // Inject config property for client webapp realm
+    // Inject config property for client ID (name) for webapp
     @Inject
     @ConfigProperty(name = CLIENT_ID_KEY)
     String clientId;
@@ -59,8 +60,9 @@ public class UserService implements IUserService {
 
     @PostConstruct
     public void init() {
+        // Initialize usersResource, clientUUid, clientRoleResource
         usersResource = keycloak.realm(clientRealm).users();
-        clientUuid = keycloak.realm(clientRealm).clients().findByClientId(clientId).getFirst().getId();
+        clientUuid = keycloak.realm(clientRealm).clients().findByClientId(clientId).get(0).getId();
         clientRoleResource = keycloak.realm(clientRealm).clients().get(clientUuid).roles().get(clientRole);
     }
 
@@ -70,17 +72,10 @@ public class UserService implements IUserService {
         UserRepresentation user = new UserRepresentation();
         // Fill in user fields
         user.setUsername(userDto.getUsername());
+        user.setEmail(userDto.getEmail());
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
-        user.setEmail(userDto.getEmail());
         user.setEnabled(true);
-        user.setEmailVerified(true);
-        org.keycloak.representations.idm.CredentialRepresentation credential =
-                new org.keycloak.representations.idm.CredentialRepresentation();
-        credential.setType(org.keycloak.representations.idm.CredentialRepresentation.PASSWORD);
-        credential.setValue(new String(userDto.getPassword()));
-        credential.setTemporary(false);
-        user.setCredentials(List.of(credential));
 
         try (Response response = usersResource.create(user)) {
             if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
@@ -96,12 +91,8 @@ public class UserService implements IUserService {
             /*
              * Add the newly created user to the role mapping.
              */
-            keycloak.realm(clientRealm)
-                    .users()
-                    .get(userId)
-                    .roles()
-                    .clientLevel(clientUuid)
-                    .add(List.of(clientRoleResource.toRepresentation()));
+            usersResource.get(userId).roles().clientLevel(clientUuid).add(List.of(clientRoleResource.toRepresentation()));
+
         }
     }
 
@@ -109,15 +100,16 @@ public class UserService implements IUserService {
     public List<UserDto> getUsers() {
         logger.info(String.format("Getting all users for realm %s and client %s", clientRealm, clientUuid));
         List<UserDto> userDtos = new ArrayList<UserDto>();
-        // Return list of DTOs for users with role "user"
-        for (UserRepresentation user : clientRoleResource.getUserMembers()) {
+        List<UserRepresentation> users = clientRoleResource.getUserMembers();
+        for (UserRepresentation user : users) {
             UserDto userDto = USER_DTO_FACTORY.createUserDto();
             userDto.setUsername(user.getUsername());
+            userDto.setEmail(user.getEmail());
             userDto.setFirstName(user.getFirstName());
             userDto.setLastName(user.getLastName());
-            userDto.setEmail(user.getEmail());
             userDtos.add(userDto);
         }
         return userDtos;
     }
+
 }

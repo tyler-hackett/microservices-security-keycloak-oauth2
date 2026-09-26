@@ -17,7 +17,9 @@
 		<module>../caf-service-client</module>
 		<module>../caf-service</module>
 		<module>../caf-webapp</module>
-	</modules>
+        <module>../caf-rest</module>
+        <module>../caf-thumbnail</module>
+    </modules>
 
 	<properties>
 		<compiler-plugin.version>3.14.0</compiler-plugin.version>

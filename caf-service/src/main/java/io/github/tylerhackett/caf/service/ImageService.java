@@ -1,154 +1,105 @@
 package io.github.tylerhackett.caf.service;
 
-import com.fasterxml.uuid.Generators;
-import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
-import io.github.tylerhackett.caf.domain.*;
 import io.github.tylerhackett.caf.service.dto.CommentDto;
 import io.github.tylerhackett.caf.service.dto.ImageDto;
-import io.github.tylerhackett.caf.service.dto.ImageDtoFactory;
+import io.github.tylerhackett.caf.service.micro.IApprovalResource;
+import io.github.tylerhackett.caf.service.micro.IImageResource;
+import io.github.tylerhackett.caf.service.micro.IUserResource;
+import io.quarkus.security.identity.SecurityIdentity;
+import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.transaction.Transactional;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @RequestScoped
-@Transactional
 public class ImageService implements IImageService {
 
-	private static final IImageFactory IMAGE_FACTORY = new ImageFactory();
-	
-	private static final ImageDtoFactory IMAGE_DTO_FACTORY = new ImageDtoFactory();
+    @Inject
+    Logger logger;
 
-	private final TimeBasedEpochGenerator uuidGenerator = Generators.timeBasedEpochGenerator();
+    @Inject
+    SecurityIdentity caller;
 
-	private final Logger logger;
+    @ConfigProperty(name = "caf.jwt.issuer")
+    String issuer;
 
-	private final IImageDao imageDao;
+    @ConfigProperty(name = "caf.jwt.audience")
+    String audience;
 
-	/**
-	 * Default constructor.
-	 */
-	public ImageService(Logger logger, IImageDao imageDao) {
-		this.logger = logger;
-		this.imageDao = imageDao;
-	}
+    @RestClient
+    IApprovalResource approvalResource;
 
-	@Override
-	public void addImage(ImageDto imageDto) {
-		Image image = IMAGE_FACTORY.createImage();
-		image.setId(imageDto.getId());
-		image.setCaption(imageDto.getCaption());
-		image.setLoader(imageDto.getLoader());
-		image.setApproved(false);
-		image.setTimestamp(Instant.now());
-		image.setUrl(imageDto.getUrl());
-		imageDao.addImage(image);
-	}
+    @RestClient
+    IImageResource imageResource;
 
-	@Override
-	public void removeImage(UUID imageId) {
-		imageDao.removeImage(imageId);
-	}
+    @RestClient
+    IUserResource userResource;
 
-	@Override
-	public void addComment(CommentDto commentDto) {
-		Comment comment = IMAGE_FACTORY.createComment();
-		comment.setId(uuidGenerator.generate());
-		comment.setText(commentDto.getText());
-		comment.setTimestamp(Instant.now());
-		comment.setAuthor(commentDto.getAuthor());
-		imageDao.addComment(commentDto.getImageId(), comment);
-	}
+    private String generateAuthToken() {
+        return "Bearer " + Jwt.subject(caller.getPrincipal().getName())
+                .issuer(issuer)
+                .audience(audience)
+                .groups("user")
+                .sign().toString();
+    }
 
-	@Override
-	public CommentDto getComment(UUID id) {
-		Comment comment = imageDao.getComment(id);
-		CommentDto commentDto = IMAGE_DTO_FACTORY.createCommentDto();
-		commentDto.setId(comment.getId());
-		commentDto.setText(comment.getText());
-		commentDto.setImageId(comment.getImage().getId());
-		commentDto.setTimestamp(comment.getTimestamp());
-		commentDto.setAuthor(comment.getAuthor());
-		return commentDto;
-	}
+    @Override
+    public void addImage(ImageDto imageDto) {
+        imageResource.addImage(generateAuthToken(), imageDto);
+    }
 
-	@Override
-	public void removeComment(UUID id) throws SecurityException {
-		imageDao.removeComment(id);
-	}
+    @Override
+    public void removeImage(UUID id) {
+        imageResource.removeImage(generateAuthToken(), id);
+    }
 
-	private ImageDto imageToImageDto(Image image, boolean includeComments) {
-		ImageDto imageDto = IMAGE_DTO_FACTORY.createImageDto();
-		imageDto.setId(image.getId());
-		imageDto.setUrl(image.getUrl());
-		imageDto.setCaption(image.getCaption());
-		imageDto.setApproved(image.isApproved());
-		imageDto.setTimestamp(image.getTimestamp());
-		imageDto.setLoader(image.getLoader());
-		if (includeComments) {
-			imageDto.setComments(commentsToCommentDtos(image.getComments()));
-		}
-		return imageDto;
-	}
+    @Override
+    public void addComment(CommentDto commentDto) {
+        imageResource.addComment(generateAuthToken(), commentDto);
+    }
 
-	private ImageDto imageToImageDto(Image image) {
-		return imageToImageDto(image, false);
-	}
+    @Override
+    public CommentDto getComment(UUID id) {
+        return imageResource.getComment(generateAuthToken(), id);
+    }
 
-	private List<ImageDto> imagesToImageDtos(List<Image> images) {
-		List<ImageDto> imageDtos = new ArrayList<>();
-		for (Image image : images) {
-			imageDtos.add(imageToImageDto(image));
-		}
-		return imageDtos;
-	}
+    @Override
+    public void removeComment(UUID id) {
+        imageResource.removeComment(generateAuthToken(), id);
+    }
 
-	private List<CommentDto> commentsToCommentDtos(List<Comment> comments) {
-		List<CommentDto> commentDtos = new ArrayList<>();
-		for (Comment comment : comments) {
-			CommentDto commentDto = IMAGE_DTO_FACTORY.createCommentDto();
-			commentDto.setId(comment.getId());
-			commentDto.setText(comment.getText());
-			commentDto.setAuthor(comment.getAuthor());
-			commentDto.setImageId(comment.getImage().getId());
-			commentDto.setTimestamp(comment.getTimestamp());
+    @Override
+    public List<ImageDto> getImages() {
+        return imageResource.getImages(generateAuthToken());
+    }
 
-			commentDtos.add(commentDto);
-		}
-		return commentDtos;
-	}
+    @Override
+    public ImageDto getImage(UUID imageId) {
+        return imageResource.getImage(generateAuthToken(), imageId);
+    }
 
-	@Override
-	public List<ImageDto> getImages(String username) {
-		if (username == null || username.isBlank()) {
-			return imagesToImageDtos(imageDao.getImages());
-		} else {
-			return imagesToImageDtos(imageDao.getImages(username));
-		}
-	}
+    @Override
+    public List<ImageDto> getImages(String username) {
+        if (username == null || username.isBlank()) {
+            return imageResource.getImages(generateAuthToken());
+        } else {
+            return userResource.getImages(generateAuthToken(), username);
+        }
+    }
 
-	@Override
-	public List<ImageDto> getImages() {
-		return getImages(null);
-	}
+    @Override
+    public List<ImageDto> getImagesForApproval() {
+        return approvalResource.getImagesForApproval(generateAuthToken());
+    }
 
-	@Override
-	public ImageDto getImage(UUID imageId) {
-		return imageToImageDto(imageDao.getImage(imageId), true);
-	}
-
-	@Override
-	public List<ImageDto> getImagesForApproval() {
-		return imagesToImageDtos(imageDao.getImagesForApproval());
-	}
-
-	@Override
-	public void updateApproval(UUID id, boolean approved) {
-		imageDao.updateApproval(id, approved);
-	}
+    @Override
+    public void updateApproval(UUID id, boolean approved) {
+        approvalResource.updateApproval(generateAuthToken(), id, approved);
+    }
 
 }
