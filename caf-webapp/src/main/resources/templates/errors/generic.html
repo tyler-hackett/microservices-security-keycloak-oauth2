@@ -1,0 +1,13 @@
+{#include base}
+    {#title}Webapp Failure{/title}
+
+    <h2>Webapp Failure</h2>
+    <p><b>Status:</b> {statusCode}</p>
+    {#if devMode}
+        <p><b>Error ID:</b> {reference}</p>
+        <p><b>Exception:</b> {exceptionType}</p>
+        <p><b>Message:</b> {exceptionMessage}</p>
+        <p><b>Path:</b> {path}</p>
+    {/if}
+
+{/include}

@@ -1,0 +1,25 @@
+{#include base}
+    {#title}Approve Images{/title}
+
+    <h2>Approve Images</h2>
+    <p>
+    {#if images}
+        <table class="gridTable">
+            <tr>
+                <th>Caption</th>
+                <th>Uploader</th>
+            </tr>
+            {#for image in images}
+                <tr>
+                    <td>
+                        <a href="/web/approval/{image.id}">{image.caption}</a>
+                    </td>
+                    <td>
+                        {image.loader}
+                    </td>
+                </tr>
+            {/for}
+        </table>
+    {/if}
+
+{/include}

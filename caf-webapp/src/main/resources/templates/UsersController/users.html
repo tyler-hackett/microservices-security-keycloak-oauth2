@@ -1,0 +1,57 @@
+{#include base}
+    {#title}All Users{/title}
+
+    <h2>All Users</h2>
+    {#if users}
+        <p>
+        <table class="gridTable">
+            <tr>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+            </tr>
+            {#for user in users}
+                <tr>
+                    <td>
+                        <a href="/web/images?username={user.username}">{user.username}</a>
+                    </td>
+                    <td>
+                        {user.firstName}
+                    </td>
+                    <td>
+                        {user.lastName}
+                    </td>
+                </tr>
+            {/for}
+        </table>
+    {/if}
+    <p>
+    <form method="post" action="/web/users">
+        <fieldset>
+            <legend>Add a user</legend>
+            <p>
+                <label for="username">Username:</label><br>
+                <input id="username" name="username" type="text"/>
+            </p>
+            <p>
+                <label for="password">Password:</label><br>
+                <input id="password" name="password" type="password"/>
+            </p>
+            <p>
+                <label for="first-name">First name:</label><br>
+                <input id="first-name" name="first-name" type="text"/>
+            </p>
+            <p>
+                <label for="last-name">Last name:</label><br>
+                <input id="last-name" name="last-name" type="text"/>
+            </p>
+            <p>
+                <label for="email">Email:</label><br>
+                <input id="email" name="email" type="email"/>
+            </p>
+            <p>
+                <button type="submit">ADD USER</button>
+            </p>
+        </fieldset>
+    </form>
+{/include}

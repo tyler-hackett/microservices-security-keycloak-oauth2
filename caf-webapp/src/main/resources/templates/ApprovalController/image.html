@@ -1,0 +1,20 @@
+{#include base}
+    {#title}Approve Image{/title}
+
+    <h2>Approve Image</h2>
+    <p><img src="{imageContent}" style="width: 500px; height: auto;"/></p>
+    <p>Caption: {image.caption}</p>
+    <p>Owner: {image.loader}</p>
+
+    <p>
+    <div class="formsRow">
+        <form action="/web/approval/{image.id}" method="POST">
+            <input id="approval" name="approval" type="hidden" value="true"/>
+            <button type="submit">APPROVE</button>
+        </form>
+        <form action="/web/approval/{image.id}" method="POST">
+            <input id="approval" name="approval" type="hidden" value="false"/>
+            <button type="submit">REJECT</button>
+        </form>
+    </div>
+{/include}

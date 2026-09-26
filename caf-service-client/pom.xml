@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>caf-service-client</artifactId>
+
+	<parent>
+		<groupId>io.github.tylerhackett</groupId>
+		<artifactId>caf-root</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../caf-root/pom.xml</relativePath>
+	</parent>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>io.github.tylerhackett</groupId>
+			<artifactId>caf-domain</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.tylerhackett</groupId>
+			<artifactId>caf-dto</artifactId>
+		</dependency>
+	</dependencies>
+</project>

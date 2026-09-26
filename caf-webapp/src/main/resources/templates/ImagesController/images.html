@@ -1,0 +1,46 @@
+{#include base}
+    {#title}View Images{/title}
+
+    {#if username}
+        <h2>View Images for {username}</h2>
+    {#else}
+        <h2>View Images</h2>
+    {/if}
+    {#if images}
+        <p>
+        <table class="gridTable">
+            <tr>
+                <th>Caption</th>
+                <th>Owner</th>
+            </tr>
+            {#for image in images}
+                <tr>
+                    <td>
+                        <a href="/web/images/{image.id}">{image.caption}</a>
+                    </td>
+                    <td>
+                        <a href="/web/images?username={image.loader}">{image.loader}</a>
+                    </td>
+                </tr>
+            {/for}
+        </table>
+    {/if}
+
+    <p>
+    <form method="post" enctype="multipart/form-data" action="/web/images">
+        <fieldset>
+            <legend>Upload New Image</legend>
+            <p>
+                <label for="caption">Caption:</label><br>
+                <input id="caption" name="caption" type="text"/>
+            </p>
+            <p>
+                <label for="image">Image file:</label><br>
+                <input id="image" name="image" type="file"/>
+            </p>
+            <p>
+                <button type="submit" value="UPLOAD">UPLOAD</button>
+            </p>
+        </fieldset>
+    </form>
+{/include}

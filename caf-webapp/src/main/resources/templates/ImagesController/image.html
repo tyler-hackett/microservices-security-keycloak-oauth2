@@ -1,0 +1,53 @@
+{#include base}
+    {#title}View Image{/title}
+
+    <h2>View Image</h2>
+    <p><img src="{imageContent}" style="width: 500px; height: auto;"/></p>
+    <p>Caption: {image.caption}</p>
+    <p>Owner: {image.loader}</p>
+
+    {#if image.comments}
+        <p>
+        <table class="gridTable">
+            <tr>
+                <th>Comment</th>
+                <th>Author</th>
+                <th></th>
+            </tr>
+            {#for comment in image.comments}
+                <tr>
+                    <td>
+                        {comment.text}
+                    </td>
+                    <td>
+                        {comment.author}
+                    </td>
+                    <td>
+                        <form action="/web/images/{image.id}/delete/{comment.id}" method="POST">
+                            <button type="submit">DELETE</button>
+                        </form>
+                    </td>
+                </tr>
+            {/for}
+        </table>
+    {/if}
+
+    <p>
+    <form action="/web/images/{image.id}/delete" method="POST">
+        <button type="submit">DELETE IMAGE</button>
+    </form>
+    <p>
+    <form action="/web/images/{image.id}" method="post">
+        <fieldset>
+            <legend>Add a comment</legend>
+            <p>
+                <label for="comment">Comment:</label><br>
+                <input id="comment" name="comment" type="text"/>
+            </p>
+            <p>
+                <input type="submit" value="POST"/>
+            </p>
+        </fieldset>
+    </form>
+
+{/include}
